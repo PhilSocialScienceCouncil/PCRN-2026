@@ -645,9 +645,13 @@ document.addEventListener('DOMContentLoaded', function() {
             });
             currentFilteredData = window.cardData;
             
-            populateVolumeFilters(window.cardData);
-            populateJournalFilters(window.cardData);
+            populateThemeFilters(window.cardData);
+            populateAuthorFilters(window.cardData);
             populateYearFilters(window.cardData);
+            populateAgeFilters(window.cardData);
+            populateMethodologyFilters(window.cardData);
+            populateLanguageFilters(window.cardData);
+            populateKeywordFilters(window.cardData);
             setupFilterEventListeners();
             renderCards(currentFilteredData);
         })
@@ -673,14 +677,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 displayYear = years.length === 1 ? years[0] : `${Math.min(...years)}-${Math.max(...years)}`;
             }
         }
-            
-        let displayVolume = 'N/A';
-        if (item.volume && Array.isArray(item.volume) && item.volume.length > 0) {
-            const volumes = item.volume.map(v => parseInt(v, 10)).filter(v => !isNaN(v));
-            if (volumes.length > 0) {
-                displayVolume = volumes.length === 1 ? volumes[0] : volumes.join(', ');
-            }
-        }
+        
         
         modalTitle.innerHTML = `${item.title}`;
 
@@ -714,29 +711,6 @@ document.addEventListener('DOMContentLoaded', function() {
     let currentPage = 1;
     window.resultsPerPage = 12;
     let currentFilteredData = [];
-
-    function getJournalThumbnail(journalName) {
-        if (!journalName) return null;
-        
-        const journalImageMap = {
-            'Aghamtao': 'https://pssc.org.ph/wp-content/uploads/2025/07/a_thumbnail.png',
-            'Philippine Geographical Journal': 'https://pssc.org.ph/wp-content/uploads/2025/07/pgs_thumbnail-e1753755649410.png',
-            'Philippine Sociological Review': 'https://pssc.org.ph/wp-content/uploads/2025/07/psw_thumbnail.png',
-            'Philippine Planning Journal': 'https://pssc.org.ph/wp-content/uploads/2025/07/ppj_thumbnail.png',
-            'Historical Bulletin': 'https://pssc.org.ph/wp-content/uploads/2025/07/hb_thumbnail.png',
-            'The Philippine Statistician': 'https://pssc.org.ph/wp-content/uploads/2025/07/stat_thumbnail-e1753755959177.png',
-            'Philippine Review of Economics': 'https://pssc.org.ph/wp-content/uploads/2025/07/pre_thumbnail-e1753755917938.png',
-            'Philippine Population Review': 'https://pssc.org.ph/wp-content/uploads/2025/07/ppr_thumbnail.png',
-            'Philippine Journal of Public Administration': 'https://pssc.org.ph/wp-content/uploads/2025/07/pjpa_thumbnail.png',
-            'Philippine Journal of Psychology': 'https://pssc.org.ph/wp-content/uploads/2025/07/pap_thumbnail.png',
-            'Philippine Communication Society Review': 'https://pssc.org.ph/wp-content/uploads/2025/07/pcsr_thumbnail-e1753755493388.png',
-            'Philippine Political Science Journal': 'https://pssc.org.ph/wp-content/uploads/2025/07/ppsj_thumbnail-scaled.jpg',
-            'Philippine Population Journal': 'https://pssc.org.ph/wp-content/uploads/2025/07/ppopj_thumbnail.png',
-            
-        };
-        
-        return journalImageMap[journalName] || null;
-    }
 
     function renderCards(cardData) {
         const container = document.getElementById('ka-card-container');
@@ -793,84 +767,6 @@ document.addEventListener('DOMContentLoaded', function() {
         updatePagination(cardData.length);
     }
 
-    function populateVolumeFilters(cardData) {
-        const volumeContainer = document.getElementById('ka-volume');
-        if (!volumeContainer) return;
-
-        volumeContainer.innerHTML = '';
-        let maxVolume = 0;
-        cardData.forEach(item => {
-            if (item.volume && Array.isArray(item.volume)) {
-                item.volume.forEach(volStr => {
-                    const volumeNum = parseInt(volStr, 10);
-                    if (!isNaN(volumeNum) && volumeNum > maxVolume) {
-                        maxVolume = volumeNum;
-                    }
-                });
-            }
-        });
-
-        for (let volume = 1; volume <= maxVolume; volume++) {
-            const checkboxWrapper = document.createElement('div');
-            checkboxWrapper.style.marginBottom = '2px';
-            checkboxWrapper.style.lineHeight = '1.2';
-            
-            const checkbox = document.createElement('input');
-            checkbox.type = 'checkbox';
-            checkbox.id = `ka-volume${volume}`;
-            checkbox.name = 'volume';
-            checkbox.value = volume;
-            
-            const label = document.createElement('label');
-            label.setAttribute('for', `ka-volume${volume}`);
-            label.innerText = volume;
-            
-            checkboxWrapper.appendChild(checkbox);
-            checkboxWrapper.appendChild(label);
-            
-            if (volume > 5) {
-                checkboxWrapper.classList.add('ka-volume-hidden');
-                checkboxWrapper.style.display = 'none';
-            }
-            
-            volumeContainer.appendChild(checkboxWrapper);
-        }
-        
-        if (maxVolume > 5) {
-            const showMoreLink = document.createElement('a');
-            showMoreLink.href = '#';
-            showMoreLink.className = 'ka-show-more-link';
-            showMoreLink.textContent = `Show more (${maxVolume - 5} more)`;
-            
-            showMoreLink.addEventListener('click', function(e) {
-                e.preventDefault();
-                const isExpanded = this.textContent.includes('Show less');
-                
-                if (isExpanded) {
-                    const allWrappers = volumeContainer.querySelectorAll('div');
-                    
-                    for (let i = 5; i < allWrappers.length; i++) {
-                        if (allWrappers[i] && !allWrappers[i].querySelector('a')) {
-                            allWrappers[i].classList.add('ka-volume-hidden');
-                            allWrappers[i].style.display = 'none';
-                        }
-                    }
-                    this.textContent = `Show more (${maxVolume - 5} more)`;
-                } else {
-                    const hiddenItems = volumeContainer.querySelectorAll('.ka-volume-hidden');
-                    hiddenItems.forEach(item => {
-                        item.classList.remove('ka-volume-hidden');
-                        item.style.display = 'block';
-                    });
-                    this.textContent = 'Show less';
-                }
-            });
-            
-            volumeContainer.appendChild(showMoreLink);
-        }
-    }
-    
-    const resultsPerPageInput = document.getElementById('ka-resultsPerPage');
     
     function adjustInputWidth(input) {
         const value = input.value.toString();
@@ -891,60 +787,6 @@ document.addEventListener('DOMContentLoaded', function() {
         adjustInputWidth(this);
         applyFilters();
     }); 
-    adjustInputWidth(resultsPerPageInput);
-
-    function populateJournalFilters(cardData) {
-        const organizationContainer = document.getElementById('ka-organization');
-        if (!organizationContainer) return;
-
-        organizationContainer.innerHTML = '';
-        const journals = new Set();
-        cardData.forEach(item => {
-            if (item.journal) {
-                journals.add(item.journal.trim());
-            }
-            journals.add("Philippine Journal of Public Administration");
-        });
-
-        const sortedJournals = Array.from(journals).sort();
-
-        sortedJournals.forEach(journal => {
-            const checkboxWrapper = document.createElement('div');
-            checkboxWrapper.style.marginBottom = '2px';
-            checkboxWrapper.style.lineHeight = '1.2';
-            
-            const input = document.createElement('input');
-            input.type = 'checkbox';
-            input.id = `ka-org${journal.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '')}`;
-            input.name = 'organization';
-            input.value = journal;
-
-            const label = document.createElement('label');
-            label.setAttribute('for', input.id);
-            label.textContent = journal;
-
-            checkboxWrapper.appendChild(input);
-            checkboxWrapper.appendChild(label);
-            organizationContainer.appendChild(checkboxWrapper);
-        });
-    }
-
-    function populateYearFilters(cardData) {
-        const yearContainer = document.getElementById('ka-year');
-        if (!yearContainer) return;
-
-        yearContainer.innerHTML = '';
-        const years = new Set();
-        cardData.forEach(item => {
-            if (item.year && Array.isArray(item.year)) {
-                item.year.forEach(yearStr => {
-                    const year = parseInt(yearStr, 10);
-                    if (!isNaN(year)) {
-                        years.add(year);
-                    }
-                });
-            }
-        });
 
         const sortedYears = Array.from(years).filter(year => !isNaN(year)).sort((a, b) => b - a);
 
@@ -1019,39 +861,34 @@ document.addEventListener('DOMContentLoaded', function() {
 
     
     function applyFilters() {
-        const query = searchInput.value.trim().toLowerCase();
+
+                <select id="filter-theme">
+          <option value="">All themes</option>
+        </select>
         
-        const selectedOrgs = Array.from(document.querySelectorAll('input[name="organization"]:checked'))
-            .map(cb => cb.nextElementSibling.innerText.trim());
-        const selectedYears = Array.from(document.querySelectorAll('input[name="year"]:checked'))
-            .map(cb => cb.value);
-        const selectedVolumes = Array.from(document.querySelectorAll('input[name="volume"]:checked'))
-            .map(cb => cb.value);
-
-        let filteredData = window.cardData.filter(item => {
-            const matchesSearch = !query || (
-                item.title.toLowerCase().includes(query) ||
-                item.author.toLowerCase().includes(query) ||
-                item.journal.toLowerCase().includes(query) ||
-                (item.year && Array.isArray(item.year) && item.year.some(y => y.toString().includes(query))) ||
-                (Array.isArray(item.tags) ? item.tags.some(tag => tag.toLowerCase().includes(query)) : false)
-            );
-
-            const matchesOrg = selectedOrgs.length === 0 ||
-                (item.journal && selectedOrgs.some(org => item.journal.includes(org)));
-
-            const matchesYear = selectedYears.length === 0 || 
-                selectedYears.includes('all') ||
-                (item.year && Array.isArray(item.year) && 
-                 item.year.some(yearStr => selectedYears.includes(yearStr)));
-
-            const matchesVolume = selectedVolumes.length === 0 ||
-                (item.volume && Array.isArray(item.volume) && 
-                 item.volume.some(volStr => selectedVolumes.includes(volStr)));
-
-            return matchesSearch && matchesOrg && matchesYear && matchesVolume;
-        });
-  
+        <select id="filter-year">
+          <option value="">All years</option>
+        </select>
+        
+        <select id="filter-age">
+          <option value="">All age groups</option>
+        </select>
+        
+        <select id="filter-methodology">
+          <option value="">All methodologies</option>
+        </select>
+        
+        <select id="filter-geo">
+          <option value="">All geographic scopes</option>
+        </select>
+        
+        <select id="filter-language">
+          <option value="">All languages</option>
+        </select>
+        
+        <input type="text" id="filter-keyword"
+          placeholder="Search by keyword, title, or abstract..." />
+        
         currentPage = 1;
         currentFilteredData = filteredData;
         renderCards(currentFilteredData)
