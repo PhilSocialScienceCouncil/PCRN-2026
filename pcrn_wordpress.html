@@ -629,7 +629,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     // Load data and initialize
-    fetch('https://pssc.org.ph/wp-content/uploads/2025/07/KAdata.json')
+    fetch('https://pssc.org.ph/wp-content/uploads/PCRNdata.json')
         .then(response => response.json())
         .then(cardData => {
             window.cardData = cardData.sort((a, b) => {
@@ -654,7 +654,7 @@ document.addEventListener('DOMContentLoaded', function() {
         .catch(error => console.error('Error loading JSON:', error));
 
     // Modal setup
-    const overlay = document.getElementById('ka-overlay');
+    const overlay = document.getElementById('ka-overlay'); 
     const modalContent = document.getElementById('ka-modalContent');
     const modalTitle = document.getElementById('ka-modal-title');
     const closeModalBtn = document.getElementById('ka-closeModal');
