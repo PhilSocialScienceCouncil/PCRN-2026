@@ -552,18 +552,30 @@
 <div class="ka-container">
     <aside class="ka-sidebar collapsed" id="ka-sidebar">
         <h2 class="ka-sidebar-heading">Filters</h2>
-        <div class="ka-filter">
-            <label class="main-label">Journal</label>
-            <div class="ka-checkbox-container" id="ka-organization"></div>
-        </div>
-        <div class="ka-filter">
-            <label class="main-label">Year</label>
-            <div class="ka-checkbox-container" id="ka-year"></div>
-        </div>
-        <div class="ka-filter">
-            <label class="main-label">Volume</label>
-            <div class="ka-checkbox-container scrollable" id="ka-volume"></div>
-        </div>
+    <div class="ka-filter">
+        <label class="main-label">Theme</label>
+        <div class="ka-checkbox-container" id="ka-theme"></div>
+    </div>
+    <div class="ka-filter">
+        <label class="main-label">Publication Year</label>
+        <div class="ka-checkbox-container" id="ka-publication-year"></div>
+    </div>
+    <div class="ka-filter">
+        <label class="main-label">Entry Type</label>
+        <div class="ka-checkbox-container" id="ka-entry-type"></div>
+    </div>
+    <div class="ka-filter">
+        <label class="main-label">Age Group</label>
+        <div class="ka-checkbox-container" id="ka-age-group"></div>
+    </div>
+    <div class="ka-filter">
+        <label class="main-label">Geography</label>
+        <div class="ka-checkbox-container" id="ka-geography"></div>
+    </div>
+    <div class="ka-filter">
+        <label class="main-label">Language</label>
+        <div class="ka-checkbox-container" id="ka-language"></div>
+    </div>
     </aside>
     <main class="ka-main-content expanded">
         <div style="display: flex; justify-content: flex-end; margin-bottom: 18px;">
@@ -644,8 +656,28 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     // Load data and initialize
-    fetch('https://pssc.org.ph/wp-content/uploads/PCRNdata.json')
+    fetch('https://tentative-PCRN-link/wp-content/uploads/PCRNdata.json')
         .then(response => response.json())
+            function populateCheckboxFilter(containerId, data, fieldName, inputName) {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+        const values = [...new Set(data.map(d => d[fieldName]).filter(v => v !== null && v !== undefined && v !== ''))].sort();
+        values.forEach(val => {
+            const wrapper = document.createElement('div');
+            wrapper.style.marginBottom = '2px';
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.name = inputName;
+            checkbox.value = val;
+            checkbox.id = containerId + '-' + val;
+            const label = document.createElement('label');
+            label.setAttribute('for', containerId + '-' + val);
+            label.innerText = val;
+            wrapper.appendChild(checkbox);
+            wrapper.appendChild(label);
+            container.appendChild(wrapper);
+                });
+            }
         .then(cardData => {
             window.cardData = cardData.sort((a, b) => {
                 const getYear = (item) => {
@@ -660,16 +692,12 @@ document.addEventListener('DOMContentLoaded', function() {
             });
             currentFilteredData = window.cardData;
             
-            populateThemeFilters(window.cardData);
-            populateAuthorFilters(window.cardData);
-            populateInstitutionFilters(window.cardData); 
-            populatePublication_YearFilters(window.cardData);
-            populateageFilters(window.cardData);
-            populateEntry_TypeFilters(window.cardData);
-            populateGeographyFilters(window.cardData);
-            populateLanguageFilters(window.cardData);
-            populateagetFilters(window.cardData);
-            populateKeywordFilters(window.cardData);
+                populateCheckboxFilter('ka-theme',        window.cardData, 'theme',            'theme');
+                populateCheckboxFilter('ka-publication-year', window.cardData, 'publication_year', 'publication_year');
+                populateCheckboxFilter('ka-entry-type',   window.cardData, 'entry_type',       'entry_type');
+                populateCheckboxFilter('ka-age-group',    window.cardData, 'age_group_target', 'age_group_target');
+                populateCheckboxFilter('ka-geography',    window.cardData, 'geography',        'geography');
+                populateCheckboxFilter('ka-language',     window.cardData, 'language',         'language');
             setupFilterEventListeners();
             renderCards(currentFilteredData);
         })
@@ -697,23 +725,23 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         
-        modalTitle.innerHTML = `${item.title}`;
+        modalTitle.innerHTML = item['author(s)'] || 'Entry Details';
 
         modalContent.innerHTML = `
-            <p><strong>Journal:</strong> ${item.journal || 'N/A'}</p>
-            <p><strong>Author(s):</strong> ${item.author || 'N/A'}</p>
-            <p><strong>Year:</strong> ${displayYear}</p>
-            <p><strong>Volume:</strong> ${displayVolume}</p>
-            <p><strong>Tags:</strong> ${item.tags || "N/A"}</p>
-            <p><a href="${item.file_link}" target="_blank">View Full Publication</a></p>
+        <p><strong>Author(s):</strong> ${item['author(s)'] || 'N/A'}</p>
+        <p><strong>Institution(s):</strong> ${item['institution(s)'] || 'N/A'}</p>
+        <p><strong>Publication Year:</strong> ${item.publication_year || 'N/A'}</p>
+        <p><strong>Entry Type:</strong> ${item.entry_type || 'N/A'}</p>
+        <p><strong>Age Group:</strong> ${item.age_group_target || 'N/A'}</p>
+        <p><strong>Geography:</strong> ${item.geography || 'N/A'}</p>
+        <p><strong>Language:</strong> ${item.language || 'N/A'}</p>
+        <p><strong>Theme:</strong> ${item.theme || 'N/A'}</p>
+        <p><strong>Abstract:</strong> ${item.abstract || 'N/A'}</p>
+        <p><a href="${item.full_text_url}" target="_blank">View Full Publication</a></p>
         `;
         
         const thumbnailPath = getJournalThumbnail(item.journal);
-        if (thumbnailPath) {
-            modalImage.innerHTML = `<img src="${thumbnailPath}" alt="${item.journal}" onerror="this.innerHTML='<div class=\\'ka-pdf-placeholder\\'><div class=\\'ka-pdf-icon\\'>📄</div><div class=\\'ka-pdf-text\\'>Image Load Error</div></div>'">`;
-        } else {
-            modalImage.innerHTML = '<div class="ka-pdf-placeholder"><div class="ka-pdf-icon">📄</div><div class="ka-pdf-text">No Image Available</div></div>';
-        }   
+            imageContainer.innerHTML = '<div class="ka-pdf-placeholder"><div class="ka-pdf-icon">📄</div><div class="ka-pdf-text">No Image</div></div>';
 
         document.getElementById('ka-overlay').classList.remove('hidden');
     }
@@ -758,25 +786,21 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
             
-            card.innerHTML = `
-            <div class="ka-card-image"></div>
-                <div class="ka-card-content">
-                    <div class="ka-card-title">${item.title}</div>
-                    <div class="ka-card-meta">
-                        <div class="ka-card-subtitle">${item.journal ? item.journal : ''}</div>
-                        <div class="ka-card-author">${displayAuthor}</div>
-                        <div class="ka-card-year">${displayYear}</div>
+                card.innerHTML = `
+                <div class="ka-card-image"></div>
+                    <div class="ka-card-content">
+                        <div class="ka-card-title">${item['author(s)'] || 'Untitled'}</div>
+                        <div class="ka-card-meta">
+                            <div class="ka-card-subtitle">${item.theme || ''}</div>
+                            <div class="ka-card-author">${item['institution(s)'] || ''}</div>
+                            <div class="ka-card-year">${item.publication_year || ''} &middot; ${item.entry_type || ''}</div>
+                        </div>
                     </div>
-                </div>
-            `;
+                `;
 
             const imageContainer = card.querySelector('.ka-card-image');
             const thumbnailPath = getJournalThumbnail(item.journal);
-            if (thumbnailPath) {
-                imageContainer.innerHTML = `<img src="${thumbnailPath}" alt="${item.journal}" onerror="this.parentElement.innerHTML='<div class=\\'ka-pdf-placeholder\\'><div class=\\'ka-pdf-icon\\'>📄</div><div class=\\'ka-pdf-text\\'>No Image</div></div>'">`;
-            } else {
                 imageContainer.innerHTML = '<div class="ka-pdf-placeholder"><div class="ka-pdf-icon">📄</div><div class="ka-pdf-text">No Image</div></div>';
-            }
 
             card.addEventListener('click', () => showModal(item));
             container.appendChild(card);
@@ -877,52 +901,42 @@ document.addEventListener('DOMContentLoaded', function() {
     const searchInput = document.querySelector('.ka-search-bar input[type="text"]');
     searchInput.addEventListener('input', applyFilters);
 
-    
-    function applyFilters() {
-
-        <select id="filter-theme">
-          <option value="">All themes</option>
-        </select>
-
-        <select id="filter-author(s)">
-          <option value="">All authors</option>
-        </select>
-
-        <select id="filter-institution(s)">
-          <option value="">All languages</option>
-        </select>
-
-        <select id="filter-publication_year">
-          <option value="">All publication years</option>
-        </select>
-
-        <select id="filter-entry_type">
-          <option value="">All languages</option>
-        </select>
-                    
-        <select id="filter-age">
-          <option value="">All age groups</option>
-        </select>
+        function applyFilters() {
+            const searchText = document.querySelector('.ka-search-bar input[type="text"]').value.toLowerCase().trim();
         
-        <select id="filter-methodology">
-          <option value="">All methodologies</option>
-        </select>
+            const checked = (name) =>
+                Array.from(document.querySelectorAll(`input[name="${name}"]:checked`)).map(cb => cb.value);
         
-        <select id="filter-geography">
-          <option value="">All geographic scopes</option>
-        </select>
+            const selectedThemes       = checked('theme');
+            const selectedYears        = checked('publication_year');
+            const selectedEntryTypes   = checked('entry_type');
+            const selectedAgeGroups    = checked('age_group_target');
+            const selectedGeographies  = checked('geography');
+            const selectedLanguages    = checked('language');
         
-        <select id="filter-language">
-          <option value="">All languages</option>
-        </select>
+            const filteredData = window.cardData.filter(item => {
+                if (selectedThemes.length > 0 && !selectedThemes.includes(item.theme)) return false;
+                if (selectedYears.length > 0 && !selectedYears.includes(String(item.publication_year))) return false;
+                if (selectedEntryTypes.length > 0 && !selectedEntryTypes.includes(item.entry_type)) return false;
+                if (selectedAgeGroups.length > 0 && !selectedAgeGroups.includes(item.age_group_target)) return false;
+                if (selectedGeographies.length > 0 && !selectedGeographies.includes(item.geography)) return false;
+                if (selectedLanguages.length > 0 && !selectedLanguages.includes(item.language)) return false;
         
-        <input type="text" id="filter-keyword"
-          placeholder="Search by keyword, title, or abstract..." />
+                if (searchText) {
+                    const searchable = [
+                        item.theme, item['author(s)'], item['institution(s)'],
+                        item.abstract, item.entry_type, item.geography, item.language
+                    ].join(' ').toLowerCase();
+                    if (!searchable.includes(searchText)) return false;
+                }
         
-        currentPage = 1;
-        currentFilteredData = filteredData;
-        renderCards(currentFilteredData)
-    }
+                return true;
+        });
+
+    currentPage = 1;
+    currentFilteredData = filteredData;
+    renderCards(currentFilteredData);
+}
 
     function updatePagination(totalCards) {
         const totalPages = Math.ceil(totalCards / window.resultsPerPage);
