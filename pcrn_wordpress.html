@@ -647,10 +647,13 @@ document.addEventListener('DOMContentLoaded', function() {
             
             populateThemeFilters(window.cardData);
             populateAuthorFilters(window.cardData);
-            populateYearFilters(window.cardData);
-            populateAgeFilters(window.cardData);
-            populateMethodologyFilters(window.cardData);
+            populateInstitutionFilters(window.cardData); 
+            populatePublication_YearFilters(window.cardData);
+            populateageFilters(window.cardData);
+            populateEntry_TypeFilters(window.cardData);
+            populateGeographyFilters(window.cardData);
             populateLanguageFilters(window.cardData);
+            populateagetFilters(window.cardData);
             populateKeywordFilters(window.cardData);
             setupFilterEventListeners();
             renderCards(currentFilteredData);
