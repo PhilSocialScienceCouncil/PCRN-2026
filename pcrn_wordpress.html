@@ -694,6 +694,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
                 populateCheckboxFilter('ka-theme',        window.cardData, 'theme',            'theme');
                 populateCheckboxFilter('ka-publication-year', window.cardData, 'publication_year', 'publication_year');
+                populateCheckboxFilter('ka-entry-type',   window.cardData, 'title',       'title');
                 populateCheckboxFilter('ka-entry-type',   window.cardData, 'entry_type',       'entry_type');
                 populateCheckboxFilter('ka-age-group',    window.cardData, 'age_group_target', 'age_group_target');
                 populateCheckboxFilter('ka-geography',    window.cardData, 'geography',        'geography');
@@ -729,6 +730,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         modalContent.innerHTML = `
         <p><strong>Author(s):</strong> ${item['author(s)'] || 'N/A'}</p>
+        <p><strong>Institution(s):</strong> ${item['title'] || 'N/A'}</p>
         <p><strong>Institution(s):</strong> ${item['institution(s)'] || 'N/A'}</p>
         <p><strong>Publication Year:</strong> ${item.publication_year || 'N/A'}</p>
         <p><strong>Entry Type:</strong> ${item.entry_type || 'N/A'}</p>
@@ -909,6 +911,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
             const selectedThemes       = checked('theme');
             const selectedYears        = checked('publication_year');
+            const selectedTitle        = checked('title');
             const selectedEntryTypes   = checked('entry_type');
             const selectedAgeGroups    = checked('age_group_target');
             const selectedGeographies  = checked('geography');
@@ -917,6 +920,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const filteredData = window.cardData.filter(item => {
                 if (selectedThemes.length > 0 && !selectedThemes.includes(item.theme)) return false;
                 if (selectedYears.length > 0 && !selectedYears.includes(String(item.publication_year))) return false;
+                if(selectedTitle.length > 0 && !selectedTitle.includes(item.title)) return false;
                 if (selectedEntryTypes.length > 0 && !selectedEntryTypes.includes(item.entry_type)) return false;
                 if (selectedAgeGroups.length > 0 && !selectedAgeGroups.includes(item.age_group_target)) return false;
                 if (selectedGeographies.length > 0 && !selectedGeographies.includes(item.geography)) return false;
@@ -924,7 +928,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
                 if (searchText) {
                     const searchable = [
-                        item.theme, item['author(s)'], item['institution(s)'],
+                        item.theme, item['author(s)'], item['institution(s)'], item.title, 
                         item.abstract, item.entry_type, item.geography, item.language
                     ].join(' ').toLowerCase();
                     if (!searchable.includes(searchText)) return false;
