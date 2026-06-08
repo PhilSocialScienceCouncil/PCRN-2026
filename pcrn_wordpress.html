@@ -656,9 +656,9 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     // Load data and initialize
-    fetch('https://tentative-PCRN-link/wp-content/uploads/PCRNdata.json')
+    fetch('https://pssc.org.ph/wp-content/uploads/PCRNdata.json')
         .then(response => response.json())
-            function populateCheckboxFilter(containerId, data, fieldName, inputName) {
+    function populateCheckboxFilter(containerId, data, fieldName, inputName) {
         const container = document.getElementById(containerId);
         if (!container) return;
         const values = [...new Set(data.map(d => d[fieldName]).filter(v => v !== null && v !== undefined && v !== ''))].sort();
@@ -677,7 +677,7 @@ document.addEventListener('DOMContentLoaded', function() {
             wrapper.appendChild(label);
             container.appendChild(wrapper);
                 });
-            }
+        }
         .then(cardData => {
             window.cardData = cardData.sort((a, b) => {
                 const getYear = (item) => {
@@ -789,7 +789,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 card.innerHTML = `
                 <div class="ka-card-image"></div>
                     <div class="ka-card-content">
-                        <div class="ka-card-title">${item['author(s)'] || 'Untitled'}</div>
+                        <div class="ka-card-title">${item['author(s)'] || 'Untitled'}div>
                         <div class="ka-card-meta">
                             <div class="ka-card-subtitle">${item.theme || ''}</div>
                             <div class="ka-card-author">${item['institution(s)'] || ''}</div>
